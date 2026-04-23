@@ -1,0 +1,193 @@
+// ============================================================
+// i18n – Lightweight translation system (DE / EN)
+// ============================================================
+
+export type Locale = 'de' | 'en';
+
+export const translations = {
+  de: {
+    // General
+    appName: 'Treffpunkt',
+    appTagline: 'Termine finden. Ohne Stress.',
+    appDescription: 'Erstelle eine Umfrage, teile den Link und findet gemeinsam den besten Termin – ganz ohne Registrierung.',
+    language: 'Sprache',
+    
+    // Landing
+    createEvent: 'Neues Event erstellen',
+    recentEvents: 'Deine letzten Events',
+    noRecentEvents: 'Noch keine Events erstellt.',
+    
+    // Event Form
+    step: 'Schritt',
+    of: 'von',
+    next: 'Weiter',
+    back: 'Zurück',
+    eventTitle: 'Titel',
+    eventTitlePlaceholder: 'z.B. Grillabend bei Max',
+    eventDescription: 'Beschreibung (optional)',
+    eventDescriptionPlaceholder: 'z.B. Bringt gute Laune mit!',
+    eventLocation: 'Ort (optional)',
+    eventLocationPlaceholder: 'z.B. Stadtpark, Pavillon 3',
+    selectDates: 'Termine vorschlagen',
+    selectDatesHint: 'Wähle Tage im Kalender und optional eine Uhrzeit.',
+    addTime: 'Uhrzeit hinzufügen',
+    removeDate: 'Entfernen',
+    reviewAndCreate: 'Übersicht & Erstellen',
+    createEventButton: 'Event erstellen 🎉',
+    eventCreated: 'Event erstellt!',
+    
+    // Event Page
+    organizedBy: 'Organisiert',
+    votingTitle: 'Abstimmung',
+    yourName: 'Dein Name',
+    yourNamePlaceholder: 'z.B. Max',
+    submitVote: 'Abstimmung abgeben',
+    updateVote: 'Abstimmung aktualisieren',
+    yes: 'Ja',
+    no: 'Nein',
+    maybe: 'Vielleicht',
+    comment: 'Kommentar (optional)',
+    commentPlaceholder: 'z.B. Komme etwas später...',
+    results: 'Ergebnis-Übersicht',
+    noVotesYet: 'Noch keine Abstimmungen.',
+    participants: 'Teilnehmer',
+    bestDate: 'Bester Termin',
+    
+    // Share
+    shareEvent: 'Event teilen',
+    copyLink: 'Link kopieren',
+    linkCopied: 'Link kopiert! ✓',
+    shareVia: 'Teilen via',
+    
+    // Carpool
+    carpoolTitle: '🚗 Fahrgemeinschaften',
+    carpoolDescription: 'Organisiert eure Fahrten direkt hier.',
+    offerRide: 'Fahrt anbieten',
+    driverName: 'Fahrer',
+    seats: 'Freie Plätze',
+    departureLocation: 'Abfahrtsort',
+    departureLocationPlaceholder: 'z.B. Hauptbahnhof',
+    joinRide: 'Mitfahren',
+    leaveRide: 'Aussteigen',
+    seatsFull: 'Voll besetzt',
+    seatsAvailable: '{available} von {total} Plätzen frei',
+    passengerName: 'Dein Name',
+    noRidesYet: 'Noch keine Fahrten angeboten.',
+    deleteRide: 'Fahrt löschen',
+    
+    // Admin
+    adminTitle: 'Event verwalten',
+    fixDate: 'Termin fixieren',
+    fixDateConfirm: 'Diesen Termin als finales Datum festlegen?',
+    dateFixed: 'Termin fixiert! 🎯',
+    unfixDate: 'Fixierung aufheben',
+    deleteEvent: 'Event löschen',
+    deleteEventConfirm: 'Event wirklich löschen? Das kann nicht rückgängig gemacht werden.',
+    editEvent: 'Event bearbeiten',
+    adminAccess: 'Admin-Bereich',
+    notAdmin: 'Du bist nicht der Ersteller dieses Events.',
+    
+    // Calendar
+    months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+    weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+    today: 'Heute',
+    
+    // Misc
+    loading: 'Laden...',
+    error: 'Fehler',
+    eventNotFound: 'Event nicht gefunden.',
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    delete: 'Löschen',
+    close: 'Schließen',
+  },
+  en: {
+    appName: 'Treffpunkt',
+    appTagline: 'Find dates. Without the hassle.',
+    appDescription: 'Create a poll, share the link and find the best date together – no registration needed.',
+    language: 'Language',
+    
+    createEvent: 'Create new event',
+    recentEvents: 'Your recent events',
+    noRecentEvents: 'No events created yet.',
+    
+    step: 'Step',
+    of: 'of',
+    next: 'Next',
+    back: 'Back',
+    eventTitle: 'Title',
+    eventTitlePlaceholder: 'e.g. BBQ at Max\'s',
+    eventDescription: 'Description (optional)',
+    eventDescriptionPlaceholder: 'e.g. Bring good vibes!',
+    eventLocation: 'Location (optional)',
+    eventLocationPlaceholder: 'e.g. City Park, Pavilion 3',
+    selectDates: 'Suggest dates',
+    selectDatesHint: 'Select days in the calendar and optionally add a time.',
+    addTime: 'Add time',
+    removeDate: 'Remove',
+    reviewAndCreate: 'Review & Create',
+    createEventButton: 'Create event 🎉',
+    eventCreated: 'Event created!',
+    
+    organizedBy: 'Organized',
+    votingTitle: 'Voting',
+    yourName: 'Your name',
+    yourNamePlaceholder: 'e.g. Max',
+    submitVote: 'Submit vote',
+    updateVote: 'Update vote',
+    yes: 'Yes',
+    no: 'No',
+    maybe: 'Maybe',
+    comment: 'Comment (optional)',
+    commentPlaceholder: 'e.g. Might be a bit late...',
+    results: 'Results overview',
+    noVotesYet: 'No votes yet.',
+    participants: 'Participants',
+    bestDate: 'Best date',
+    
+    shareEvent: 'Share event',
+    copyLink: 'Copy link',
+    linkCopied: 'Link copied! ✓',
+    shareVia: 'Share via',
+    
+    carpoolTitle: '🚗 Carpooling',
+    carpoolDescription: 'Organize your rides right here.',
+    offerRide: 'Offer a ride',
+    driverName: 'Driver',
+    seats: 'Available seats',
+    departureLocation: 'Departure',
+    departureLocationPlaceholder: 'e.g. Main Station',
+    joinRide: 'Join ride',
+    leaveRide: 'Leave ride',
+    seatsFull: 'Fully booked',
+    seatsAvailable: '{available} of {total} seats free',
+    passengerName: 'Your name',
+    noRidesYet: 'No rides offered yet.',
+    deleteRide: 'Delete ride',
+    
+    adminTitle: 'Manage event',
+    fixDate: 'Fix date',
+    fixDateConfirm: 'Set this date as final?',
+    dateFixed: 'Date fixed! 🎯',
+    unfixDate: 'Unfix date',
+    deleteEvent: 'Delete event',
+    deleteEventConfirm: 'Really delete this event? This cannot be undone.',
+    editEvent: 'Edit event',
+    adminAccess: 'Admin area',
+    notAdmin: 'You are not the creator of this event.',
+    
+    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    today: 'Today',
+    
+    loading: 'Loading...',
+    error: 'Error',
+    eventNotFound: 'Event not found.',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    close: 'Close',
+  },
+} as const;
+
+export type TranslationKey = keyof typeof translations.de;
