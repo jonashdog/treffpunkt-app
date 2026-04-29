@@ -18,14 +18,21 @@ export default function AdminPage() {
   const [isEventAdmin, setIsEventAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const loadData = useCallback(() => {
-    const ev = getEvent(eventId);
-    setEvent(ev);
-    if (ev) {
-      setIsEventAdmin(isAdmin(eventId));
+  const loadData = useCallback(async () => {
+    try {
+      const ev = await getEvent(eventId);
+      setEvent(ev);
+      if (ev) {
+        const adminStatus = await isAdmin(eventId);
+        setIsEventAdmin(adminStatus);
+      }
+    } catch (err) {
+      console.error('Failed to load event:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [eventId]);
 
   useEffect(() => {
@@ -52,18 +59,33 @@ export default function AdminPage() {
     );
   }
 
-  function handleFixDate(dateId: string) {
-    if (event?.fixed_date_id === dateId) {
-      unfixDate(eventId);
-    } else {
-      fixDate(eventId, dateId);
+  async function handleFixDate(dateId: string) {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      if (event?.fixed_date_id === dateId) {
+        await unfixDate(eventId);
+      } else {
+        await fixDate(eventId, dateId);
+      }
+      await loadData();
+    } catch (err) {
+      console.error('Failed to fix/unfix date:', err);
+    } finally {
+      setIsProcessing(false);
     }
-    loadData();
   }
 
-  function handleDelete() {
-    deleteEvent(eventId);
-    router.push('/');
+  async function handleDelete() {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      await deleteEvent(eventId);
+      router.push('/');
+    } catch (err) {
+      console.error('Failed to delete event:', err);
+      setIsProcessing(false);
+    }
   }
 
   return (
@@ -101,8 +123,9 @@ export default function AdminPage() {
               <button
                 key={dateOption.id}
                 onClick={() => handleFixDate(dateOption.id)}
+                disabled={isProcessing}
                 className={cn(
-                  'w-full flex items-center justify-between p-3 rounded-xl transition-all',
+                  'w-full flex items-center justify-between p-3 rounded-xl transition-all disabled:opacity-50',
                   isFixed
                     ? 'bg-[var(--color-success-bg)] border-2 border-[var(--color-success)]'
                     : 'bg-white/[0.03] border border-[var(--color-border)] hover:bg-white/[0.06]'
@@ -143,19 +166,21 @@ export default function AdminPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmDelete(false)}
+                disabled={isProcessing}
                 className="flex-1 py-2.5 rounded-xl text-sm font-medium
                            text-[var(--color-text-secondary)] border border-[var(--color-border)]
-                           hover:bg-white/5 transition-colors"
+                           hover:bg-white/5 transition-colors disabled:opacity-50"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleDelete}
+                disabled={isProcessing}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold
                            bg-[var(--color-danger)] text-white hover:opacity-90
-                           active:scale-[0.98] transition-all"
+                           active:scale-[0.98] transition-all disabled:opacity-50"
               >
-                {t('delete')}
+                {isProcessing ? '⏳...' : t('delete')}
               </button>
             </div>
           </div>

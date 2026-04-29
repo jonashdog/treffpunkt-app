@@ -22,14 +22,23 @@ export default function EventPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'vote' | 'results'>('vote');
 
-  const loadData = useCallback(() => {
-    const ev = getEvent(eventId);
-    setEvent(ev);
-    if (ev) {
-      setVotes(getVotesForEvent(eventId));
-      setIsEventAdmin(isAdmin(eventId));
+  const loadData = useCallback(async () => {
+    try {
+      const ev = await getEvent(eventId);
+      setEvent(ev);
+      if (ev) {
+        const [votesData, adminStatus] = await Promise.all([
+          getVotesForEvent(eventId),
+          isAdmin(eventId),
+        ]);
+        setVotes(votesData);
+        setIsEventAdmin(adminStatus);
+      }
+    } catch (err) {
+      console.error('Failed to load event:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [eventId]);
 
   useEffect(() => {
