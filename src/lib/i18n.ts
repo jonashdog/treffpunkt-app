@@ -25,7 +25,7 @@ export const translations = {
     eventTitle: 'Titel',
     eventTitlePlaceholder: 'z.B. Grillabend bei Max',
     eventDescription: 'Beschreibung (optional)',
-    eventDescriptionPlaceholder: 'z.B. Bringt gute Laune mit!',
+    eventDescriptionPlaceholder: 'z.B. Bringt ordentlich Bierdurst mit!',
     eventLocation: 'Ort (optional)',
     eventLocationPlaceholder: 'z.B. Stadtpark, Pavillon 3',
     selectDates: 'Termine vorschlagen',
