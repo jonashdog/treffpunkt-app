@@ -3,7 +3,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslation } from '@/components/providers/I18nProvider';
-import { getEvent, getVotesForEvent, isAdmin } from '@/lib/store';
+import { getAdminTokens } from '@/lib/store';
+import { getEventAction, getVotesAction, checkAdminAction } from '@/lib/actions';
 import { type EventWithDates, type Vote } from '@/types';
 import VotingSection from '@/components/event/VotingSection';
 import VoteResultsGrid from '@/components/event/VoteResultsGrid';
@@ -24,12 +25,15 @@ export default function EventPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const ev = await getEvent(eventId);
+      const ev = await getEventAction(eventId);
       setEvent(ev);
       if (ev) {
+        const tokens = getAdminTokens();
+        const localToken = tokens[eventId];
+        
         const [votesData, adminStatus] = await Promise.all([
-          getVotesForEvent(eventId),
-          isAdmin(eventId),
+          getVotesAction(eventId),
+          localToken ? checkAdminAction(eventId, localToken) : Promise.resolve(false),
         ]);
         setVotes(votesData);
         setIsEventAdmin(adminStatus);

@@ -13,9 +13,6 @@ A lightweight, mobile-first web app for collaborative scheduling. A modern alter
 - **No Registration**: The event creator simply shares the link. Anyone with the link can vote.
 - **Security by Obscurity**: Events are protected by secure, long UUIDs.
 - **Carpools**: Integrated module to offer rides and reserve seats directly within the event.
-- **Admin Functions**: The creator receives an admin token locally and can fix the final date or delete the event.
-- **Bilingual**: Lightweight i18n system (German / English).
-- **Responsive Design**: Built from the ground up "mobile-first" with modern glassmorphism UI elements.
 
 ## 🛠️ Tech Stack
 

@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/components/providers/I18nProvider';
-import { getEvent, isAdmin, fixDate, unfixDate, deleteEvent } from '@/lib/store';
+import { getAdminTokens, removeAdminToken } from '@/lib/store';
+import { getEventAction, checkAdminAction, fixDateAction, unfixDateAction, deleteEventAction } from '@/lib/actions';
 import { type EventWithDates } from '@/types';
 import { formatDateTime, cn } from '@/lib/utils';
 import type { Locale } from '@/lib/i18n';
@@ -22,10 +23,12 @@ export default function AdminPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const ev = await getEvent(eventId);
+      const ev = await getEventAction(eventId);
       setEvent(ev);
       if (ev) {
-        const adminStatus = await isAdmin(eventId);
+        const tokens = getAdminTokens();
+        const localToken = tokens[eventId];
+        const adminStatus = localToken ? await checkAdminAction(eventId, localToken) : false;
         setIsEventAdmin(adminStatus);
       }
     } catch (err) {
@@ -63,10 +66,14 @@ export default function AdminPage() {
     if (isProcessing) return;
     setIsProcessing(true);
     try {
+      const tokens = getAdminTokens();
+      const localToken = tokens[eventId];
+      if (!localToken) return;
+
       if (event?.fixed_date_id === dateId) {
-        await unfixDate(eventId);
+        await unfixDateAction(eventId, localToken);
       } else {
-        await fixDate(eventId, dateId);
+        await fixDateAction(eventId, dateId, localToken);
       }
       await loadData();
     } catch (err) {
@@ -80,7 +87,12 @@ export default function AdminPage() {
     if (isProcessing) return;
     setIsProcessing(true);
     try {
-      await deleteEvent(eventId);
+      const tokens = getAdminTokens();
+      const localToken = tokens[eventId];
+      if (!localToken) return;
+
+      await deleteEventAction(eventId, localToken);
+      removeAdminToken(eventId);
       router.push('/');
     } catch (err) {
       console.error('Failed to delete event:', err);

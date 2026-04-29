@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/components/providers/I18nProvider';
 import { type Vote, type VoteStatus, type DateOption } from '@/types';
-import { submitVotes, getVotesForEvent, getSavedVoterName } from '@/lib/store';
+import { getSavedVoterName, saveVoterName } from '@/lib/store';
+import { submitVotesAction, getVotesAction } from '@/lib/actions';
 import { formatDateTime, cn } from '@/lib/utils';
 import type { Locale } from '@/lib/i18n';
 
@@ -35,7 +36,7 @@ export default function VotingSection({
   useMemo(() => {
     if (savedName && !initialLoaded) {
       setInitialLoaded(true);
-      getVotesForEvent(eventId).then((existingVotes) => {
+      getVotesAction(eventId).then((existingVotes) => {
         const myVotes = existingVotes.filter((v) => v.voter_name === savedName);
         if (myVotes.length > 0) {
           const voteMap: Record<string, VoteStatus> = {};
@@ -76,7 +77,8 @@ export default function VotingSection({
         comment: comments[d.id],
       }));
 
-      await submitVotes(eventId, voterName.trim(), voteData);
+      await submitVotesAction(eventId, voterName.trim(), voteData);
+      saveVoterName(eventId, voterName.trim());
       setSubmitted(true);
       onVotesChanged();
     } catch (err) {
