@@ -108,7 +108,7 @@ export const translations = {
     githubDesc: 'Du bist Entwickler oder einfach nur neugierig? Schau dir den Code an, melde Fehler oder trage selbst etwas bei! :)',
     viewGithub: 'GitHub ansehen ↗',
     aboutDevTitle: 'Über den Entwickler',
-    aboutDevP1: 'Ich bin Jonas. Da die Terminfindung mit meinen Freunden immer im absoluten Chaos geendet ist, habe ich diese App einfach "just for fun" entwickelt. Hoffentlich spart sie euch genauso viele Nerven wie mir!',
+    aboutDevP1: 'Ich bin Jonas und habe Treffpunkt in meiner Freizeit entwickelt. Wenn dir die App gefällt und sie dir hilft, Zeit zu sparen – wunderbar! Genau dafür ist sie gedacht.',
     aboutDevP2: '🤖 Dieses Projekt wurde mit Unterstützung von Künstlicher Intelligenz entwickelt.',
   },
   en: {
