@@ -40,8 +40,12 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="text-center py-6 text-xs text-[var(--color-text-muted)]">
-        {t('appName')} · {new Date().getFullYear()} JH
+      <footer className="text-center py-6 text-xs text-[var(--color-text-muted)] flex items-center justify-center gap-3">
+        <span>{t('appName')} · {new Date().getFullYear()} JH</span>
+        <span>|</span>
+        <a href="/about" className="hover:text-[var(--color-accent)] transition-colors">
+          {t('aboutProject')}
+        </a>
       </footer>
     </div>
   );

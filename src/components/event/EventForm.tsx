@@ -16,6 +16,7 @@ export default function EventForm() {
   const { t } = useTranslation();
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -27,22 +28,30 @@ export default function EventForm() {
   const canAdvance1 = title.trim().length > 0;
   const canAdvance2 = selectedDates.length > 0;
 
-  function handleCreate() {
-    const dateTimes = selectedDates
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .map((sd) => {
-        const d = new Date(sd.date);
-        if (sd.time) {
-          const [h, m] = sd.time.split(':').map(Number);
-          d.setHours(h, m, 0, 0);
-        } else {
-          d.setHours(0, 0, 0, 0);
-        }
-        return d.toISOString();
-      });
+  async function handleCreate() {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const { event } = createEvent(title.trim(), description.trim(), location.trim(), dateTimes);
-    router.push(`/event/${event.id}`);
+    try {
+      const dateTimes = selectedDates
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map((sd) => {
+          const d = new Date(sd.date);
+          if (sd.time) {
+            const [h, m] = sd.time.split(':').map(Number);
+            d.setHours(h, m, 0, 0);
+          } else {
+            d.setHours(0, 0, 0, 0);
+          }
+          return d.toISOString();
+        });
+
+      const { event } = await createEvent(title.trim(), description.trim(), location.trim(), dateTimes);
+      router.push(`/event/${event.id}`);
+    } catch (err) {
+      console.error('Failed to create event:', err);
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -267,11 +276,15 @@ export default function EventForm() {
             </button>
             <button
               onClick={handleCreate}
-              className="flex-1 py-3.5 rounded-xl font-semibold text-base
-                         gradient-accent text-white hover:opacity-90 glow
-                         active:scale-[0.98] transition-all duration-200"
+              disabled={isSubmitting}
+              className={cn(
+                'flex-1 py-3.5 rounded-xl font-semibold text-base transition-all duration-200',
+                isSubmitting
+                  ? 'bg-white/10 text-[var(--color-text-muted)] cursor-wait'
+                  : 'gradient-accent text-white hover:opacity-90 glow active:scale-[0.98]'
+              )}
             >
-              {t('createEventButton')}
+              {isSubmitting ? '⏳ ...' : t('createEventButton')}
             </button>
           </div>
         </div>

@@ -11,12 +11,12 @@ export const translations = {
     appTagline: 'Termine finden. Ohne Stress.',
     appDescription: 'Erstelle eine Umfrage, teile den Link und findet gemeinsam den besten Termin – ganz ohne Registrierung.',
     language: 'Sprache',
-    
+
     // Landing
     createEvent: 'Neues Event erstellen',
     recentEvents: 'Deine letzten Events',
     noRecentEvents: 'Noch keine Events erstellt.',
-    
+
     // Event Form
     step: 'Schritt',
     of: 'von',
@@ -35,7 +35,7 @@ export const translations = {
     reviewAndCreate: 'Übersicht & Erstellen',
     createEventButton: 'Event erstellen 🎉',
     eventCreated: 'Event erstellt!',
-    
+
     // Event Page
     organizedBy: 'Organisiert',
     votingTitle: 'Abstimmung',
@@ -52,13 +52,13 @@ export const translations = {
     noVotesYet: 'Noch keine Abstimmungen.',
     participants: 'Teilnehmer',
     bestDate: 'Bester Termin',
-    
+
     // Share
     shareEvent: 'Event teilen',
     copyLink: 'Link kopieren',
     linkCopied: 'Link kopiert! ✓',
     shareVia: 'Teilen via',
-    
+
     // Carpool
     carpoolTitle: '🚗 Fahrgemeinschaften',
     carpoolDescription: 'Organisiert eure Fahrten direkt hier.',
@@ -74,7 +74,7 @@ export const translations = {
     passengerName: 'Dein Name',
     noRidesYet: 'Noch keine Fahrten angeboten.',
     deleteRide: 'Fahrt löschen',
-    
+
     // Admin
     adminTitle: 'Event verwalten',
     fixDate: 'Termin fixieren',
@@ -86,12 +86,12 @@ export const translations = {
     editEvent: 'Event bearbeiten',
     adminAccess: 'Admin-Bereich',
     notAdmin: 'Du bist nicht der Ersteller dieses Events.',
-    
+
     // Calendar
     months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
     weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
     today: 'Heute',
-    
+
     // Misc
     loading: 'Laden...',
     error: 'Fehler',
@@ -99,18 +99,28 @@ export const translations = {
     save: 'Speichern',
     cancel: 'Abbrechen',
     delete: 'Löschen',
-    close: 'Schließen',
+    // About Page
+    aboutProject: 'Über dieses Projekt',
+    aboutP1: 'Treffpunkt ist entstanden, um das Planen von gemeinsamen Terminen mit Freunden so einfach und reibungslos wie möglich zu machen. Keine Anmeldung, keine versteckten Kosten, keine Werbung – einfach nur ein Link und ein paar Klicks.',
+    openSourceTitle: 'Open Source & Transparenz',
+    openSourceP1: 'Dieses Projekt ist komplett Open Source. Das bedeutet, der gesamte Quellcode ist öffentlich einsehbar.',
+    githubRepo: 'GitHub Repository',
+    githubDesc: 'Du bist Entwickler oder einfach nur neugierig? Schau dir den Code an, melde Fehler oder trage selbst etwas bei! :)',
+    viewGithub: 'GitHub ansehen ↗',
+    aboutDevTitle: 'Über den Entwickler',
+    aboutDevP1: 'Ich bin Jonas. Da die Terminfindung mit meinen Freunden immer im absoluten Chaos geendet ist, habe ich diese App einfach "just for fun" entwickelt. Hoffentlich spart sie euch genauso viele Nerven wie mir!',
+    aboutDevP2: '🤖 Dieses Projekt wurde mit Unterstützung von Künstlicher Intelligenz entwickelt.',
   },
   en: {
     appName: 'Treffpunkt',
     appTagline: 'Find dates. Without the hassle.',
     appDescription: 'Create a poll, share the link and find the best date together – no registration needed.',
     language: 'Language',
-    
+
     createEvent: 'Create new event',
     recentEvents: 'Your recent events',
     noRecentEvents: 'No events created yet.',
-    
+
     step: 'Step',
     of: 'of',
     next: 'Next',
@@ -128,7 +138,7 @@ export const translations = {
     reviewAndCreate: 'Review & Create',
     createEventButton: 'Create event 🎉',
     eventCreated: 'Event created!',
-    
+
     organizedBy: 'Organized',
     votingTitle: 'Voting',
     yourName: 'Your name',
@@ -144,12 +154,12 @@ export const translations = {
     noVotesYet: 'No votes yet.',
     participants: 'Participants',
     bestDate: 'Best date',
-    
+
     shareEvent: 'Share event',
     copyLink: 'Copy link',
     linkCopied: 'Link copied! ✓',
     shareVia: 'Share via',
-    
+
     carpoolTitle: '🚗 Carpooling',
     carpoolDescription: 'Organize your rides right here.',
     offerRide: 'Offer a ride',
@@ -164,7 +174,7 @@ export const translations = {
     passengerName: 'Your name',
     noRidesYet: 'No rides offered yet.',
     deleteRide: 'Delete ride',
-    
+
     adminTitle: 'Manage event',
     fixDate: 'Fix date',
     fixDateConfirm: 'Set this date as final?',
@@ -175,18 +185,28 @@ export const translations = {
     editEvent: 'Edit event',
     adminAccess: 'Admin area',
     notAdmin: 'You are not the creator of this event.',
-    
+
     months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     today: 'Today',
-    
+
     loading: 'Loading...',
     error: 'Error',
     eventNotFound: 'Event not found.',
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
-    close: 'Close',
+    // About Page
+    aboutProject: 'About this project',
+    aboutP1: 'Treffpunkt was created to make scheduling events with friends as simple and seamless as possible. No registration, no hidden costs, no ads – just a link and a few clicks.',
+    openSourceTitle: 'Open Source & Transparency',
+    openSourceP1: 'This project is entirely Open Source. This means the entire source code is publicly accessible.',
+    githubRepo: 'GitHub Repository',
+    githubDesc: 'Are you a developer or just curious? Check out the code, report bugs, or contribute yourself! :)',
+    viewGithub: 'View on GitHub ↗',
+    aboutDevTitle: 'About the developer',
+    aboutDevP1: 'I am Jonas. Since trying to coordinate dates with my friends always ended in absolute chaos, I built this app "just for fun". I hope it saves you as much sanity as it saves me!',
+    aboutDevP2: '🤖 This project was developed with the assistance of AI.',
   },
 } as const;
 

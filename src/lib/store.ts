@@ -1,8 +1,9 @@
 // ============================================================
-// Mock Store – localStorage-based data persistence
-// Ready for 1:1 Supabase migration
+// Store – Supabase-based data persistence
+// All functions are async and communicate with the cloud DB
 // ============================================================
 
+import { supabase } from '@/lib/supabase';
 import {
   type Event,
   type DateOption,
@@ -16,121 +17,92 @@ import {
 
 // ---- Helpers ----
 
-function generateId(): string {
-  return crypto.randomUUID();
-}
-
 function generateToken(): string {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 16);
 }
 
-function getStore<T>(key: string): T[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const data = localStorage.getItem(`treffpunkt-${key}`);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-function setStore<T>(key: string, data: T[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(`treffpunkt-${key}`, JSON.stringify(data));
-}
-
 // ---- Events ----
 
-export function createEvent(
+export async function createEvent(
   title: string,
   description: string,
   location: string,
-  dateTimes: string[] // ISO strings
-): { event: Event; adminToken: string } {
-  const id = generateId();
+  dateTimes: string[]
+): Promise<{ event: Event; adminToken: string }> {
   const adminToken = generateToken();
 
-  const event: Event = {
-    id,
-    title,
-    description: description || undefined,
-    location: location || undefined,
-    admin_token: adminToken,
-    created_at: new Date().toISOString(),
-  };
+  const { data: event, error } = await supabase
+    .from('events')
+    .insert({
+      title,
+      description: description || null,
+      location: location || null,
+      admin_token: adminToken,
+    })
+    .select()
+    .single();
 
-  const dates: DateOption[] = dateTimes.map((dt) => ({
-    id: generateId(),
-    event_id: id,
+  if (error || !event) throw new Error(error?.message || 'Failed to create event');
+
+  // Insert date options
+  const dateRows = dateTimes.map((dt) => ({
+    event_id: event.id,
     datetime: dt,
   }));
 
-  const events = getStore<Event>('events');
-  events.push(event);
-  setStore('events', events);
+  const { error: dateError } = await supabase.from('date_options').insert(dateRows);
+  if (dateError) throw new Error(dateError.message);
 
-  const existingDates = getStore<DateOption>('dates');
-  setStore('dates', [...existingDates, ...dates]);
+  // Save admin token locally so the creator can manage the event
+  saveAdminToken(event.id, adminToken);
 
-  // Save admin token mapping
-  const adminTokens = getAdminTokens();
-  adminTokens[id] = adminToken;
-  localStorage.setItem('treffpunkt-admin-tokens', JSON.stringify(adminTokens));
-
-  return { event, adminToken };
+  return { event: event as Event, adminToken };
 }
 
-export function getEvent(id: string): EventWithDates | null {
-  const events = getStore<Event>('events');
-  const event = events.find((e) => e.id === id);
-  if (!event) return null;
+export async function getEvent(id: string): Promise<EventWithDates | null> {
+  const { data: event, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  const dates = getStore<DateOption>('dates').filter((d) => d.event_id === id);
-  dates.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
+  if (error || !event) return null;
 
-  return { ...event, dates };
+  const { data: dates } = await supabase
+    .from('date_options')
+    .select('*')
+    .eq('event_id', id)
+    .order('datetime', { ascending: true });
+
+  return {
+    ...(event as Event),
+    dates: (dates || []) as DateOption[],
+  };
 }
 
-export function deleteEvent(id: string): void {
-  setStore('events', getStore<Event>('events').filter((e) => e.id !== id));
-  setStore('dates', getStore<DateOption>('dates').filter((d) => d.event_id !== id));
-  setStore('votes', getStore<Vote>('votes').filter((v) => v.event_id !== id));
+export async function deleteEvent(id: string): Promise<void> {
+  // CASCADE will handle date_options, votes, carpools, carpool_passengers
+  await supabase.from('events').delete().eq('id', id);
 
-  // Clean up carpools
-  const carpools = getStore<Carpool>('carpools');
-  const eventCarpoolIds = carpools.filter((c) => c.event_id === id).map((c) => c.id);
-  setStore('carpools', carpools.filter((c) => c.event_id !== id));
-  setStore(
-    'carpool-passengers',
-    getStore<CarpoolPassenger>('carpool-passengers').filter(
-      (p) => !eventCarpoolIds.includes(p.carpool_id)
-    )
-  );
-
-  const adminTokens = getAdminTokens();
-  delete adminTokens[id];
-  localStorage.setItem('treffpunkt-admin-tokens', JSON.stringify(adminTokens));
+  // Clean up local admin token
+  removeAdminToken(id);
 }
 
-export function fixDate(eventId: string, dateId: string): void {
-  const events = getStore<Event>('events');
-  const idx = events.findIndex((e) => e.id === eventId);
-  if (idx !== -1) {
-    events[idx].fixed_date_id = dateId;
-    setStore('events', events);
-  }
+export async function fixDate(eventId: string, dateId: string): Promise<void> {
+  await supabase
+    .from('events')
+    .update({ fixed_date_id: dateId })
+    .eq('id', eventId);
 }
 
-export function unfixDate(eventId: string): void {
-  const events = getStore<Event>('events');
-  const idx = events.findIndex((e) => e.id === eventId);
-  if (idx !== -1) {
-    events[idx].fixed_date_id = undefined;
-    setStore('events', events);
-  }
+export async function unfixDate(eventId: string): Promise<void> {
+  await supabase
+    .from('events')
+    .update({ fixed_date_id: null })
+    .eq('id', eventId);
 }
 
-// ---- Admin Tokens ----
+// ---- Admin Tokens (local only – stored in localStorage) ----
 
 function getAdminTokens(): Record<string, string> {
   if (typeof window === 'undefined') return {};
@@ -142,10 +114,32 @@ function getAdminTokens(): Record<string, string> {
   }
 }
 
-export function isAdmin(eventId: string): boolean {
+function saveAdminToken(eventId: string, token: string): void {
+  if (typeof window === 'undefined') return;
   const tokens = getAdminTokens();
-  const event = getStore<Event>('events').find((e) => e.id === eventId);
-  return !!(event && tokens[eventId] === event.admin_token);
+  tokens[eventId] = token;
+  localStorage.setItem('treffpunkt-admin-tokens', JSON.stringify(tokens));
+}
+
+function removeAdminToken(eventId: string): void {
+  if (typeof window === 'undefined') return;
+  const tokens = getAdminTokens();
+  delete tokens[eventId];
+  localStorage.setItem('treffpunkt-admin-tokens', JSON.stringify(tokens));
+}
+
+export async function isAdmin(eventId: string): Promise<boolean> {
+  const tokens = getAdminTokens();
+  const localToken = tokens[eventId];
+  if (!localToken) return false;
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('admin_token')
+    .eq('id', eventId)
+    .single();
+
+  return !!(event && event.admin_token === localToken);
 }
 
 export function getCreatedEventIds(): string[] {
@@ -155,36 +149,44 @@ export function getCreatedEventIds(): string[] {
 
 // ---- Votes ----
 
-export function submitVotes(
+export async function submitVotes(
   eventId: string,
   voterName: string,
   votes: { dateId: string; status: VoteStatus; comment?: string }[]
-): void {
-  const allVotes = getStore<Vote>('votes');
+): Promise<void> {
+  // Delete old votes from this voter for this event
+  await supabase
+    .from('votes')
+    .delete()
+    .eq('event_id', eventId)
+    .eq('voter_name', voterName);
 
-  // Remove old votes from this voter for this event
-  const filtered = allVotes.filter(
-    (v) => !(v.event_id === eventId && v.voter_name === voterName)
-  );
-
-  // Add new votes
-  const newVotes: Vote[] = votes.map((v) => ({
-    id: generateId(),
+  // Insert new votes
+  const voteRows = votes.map((v) => ({
     event_id: eventId,
     date_id: v.dateId,
     voter_name: voterName,
     status: v.status,
-    comment: v.comment || undefined,
+    comment: v.comment || null,
   }));
 
-  setStore('votes', [...filtered, ...newVotes]);
+  const { error } = await supabase.from('votes').insert(voteRows);
+  if (error) throw new Error(error.message);
 
-  // Save voter name for this event
-  localStorage.setItem(`treffpunkt-voter-${eventId}`, voterName);
+  // Save voter name locally
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(`treffpunkt-voter-${eventId}`, voterName);
+  }
 }
 
-export function getVotesForEvent(eventId: string): Vote[] {
-  return getStore<Vote>('votes').filter((v) => v.event_id === eventId);
+export async function getVotesForEvent(eventId: string): Promise<Vote[]> {
+  const { data, error } = await supabase
+    .from('votes')
+    .select('*')
+    .eq('event_id', eventId);
+
+  if (error) return [];
+  return (data || []) as Vote[];
 }
 
 export function getSavedVoterName(eventId: string): string | null {
@@ -194,71 +196,85 @@ export function getSavedVoterName(eventId: string): string | null {
 
 // ---- Carpools ----
 
-export function createCarpool(
+export async function createCarpool(
   eventId: string,
   driverName: string,
   totalSeats: number,
   departureLocation: string
-): Carpool {
-  const carpool: Carpool = {
-    id: generateId(),
-    event_id: eventId,
-    driver_name: driverName,
-    total_seats: totalSeats,
-    departure_location: departureLocation,
-  };
+): Promise<Carpool> {
+  const { data, error } = await supabase
+    .from('carpools')
+    .insert({
+      event_id: eventId,
+      driver_name: driverName,
+      total_seats: totalSeats,
+      departure_location: departureLocation,
+    })
+    .select()
+    .single();
 
-  const carpools = getStore<Carpool>('carpools');
-  carpools.push(carpool);
-  setStore('carpools', carpools);
-
-  return carpool;
+  if (error || !data) throw new Error(error?.message || 'Failed to create carpool');
+  return data as Carpool;
 }
 
-export function getCarpoolsForEvent(eventId: string): CarpoolWithPassengers[] {
-  const carpools = getStore<Carpool>('carpools').filter((c) => c.event_id === eventId);
-  const allPassengers = getStore<CarpoolPassenger>('carpool-passengers');
+export async function getCarpoolsForEvent(eventId: string): Promise<CarpoolWithPassengers[]> {
+  const { data: carpools } = await supabase
+    .from('carpools')
+    .select('*')
+    .eq('event_id', eventId);
+
+  if (!carpools || carpools.length === 0) return [];
+
+  const carpoolIds = carpools.map((c) => c.id);
+  const { data: passengers } = await supabase
+    .from('carpool_passengers')
+    .select('*')
+    .in('carpool_id', carpoolIds);
 
   return carpools.map((c) => ({
-    ...c,
-    passengers: allPassengers.filter((p) => p.carpool_id === c.id),
+    ...(c as Carpool),
+    passengers: ((passengers || []) as CarpoolPassenger[]).filter(
+      (p) => p.carpool_id === c.id
+    ),
   }));
 }
 
-export function joinCarpool(carpoolId: string, passengerName: string): boolean {
-  const carpools = getStore<Carpool>('carpools');
-  const carpool = carpools.find((c) => c.id === carpoolId);
+export async function joinCarpool(carpoolId: string, passengerName: string): Promise<boolean> {
+  // Check if seat is available
+  const { data: carpool } = await supabase
+    .from('carpools')
+    .select('total_seats')
+    .eq('id', carpoolId)
+    .single();
+
   if (!carpool) return false;
 
-  const passengers = getStore<CarpoolPassenger>('carpool-passengers');
-  const carpoolPassengers = passengers.filter((p) => p.carpool_id === carpoolId);
+  const { data: existing } = await supabase
+    .from('carpool_passengers')
+    .select('id')
+    .eq('carpool_id', carpoolId);
 
-  if (carpoolPassengers.length >= carpool.total_seats) return false;
-  if (carpoolPassengers.some((p) => p.passenger_name === passengerName)) return false;
+  if ((existing || []).length >= carpool.total_seats) return false;
 
-  passengers.push({
-    id: generateId(),
-    carpool_id: carpoolId,
-    passenger_name: passengerName,
-  });
-  setStore('carpool-passengers', passengers);
-  return true;
+  const { error } = await supabase
+    .from('carpool_passengers')
+    .insert({
+      carpool_id: carpoolId,
+      passenger_name: passengerName,
+    });
+
+  return !error;
 }
 
-export function leaveCarpool(carpoolId: string, passengerName: string): void {
-  const passengers = getStore<CarpoolPassenger>('carpool-passengers');
-  setStore(
-    'carpool-passengers',
-    passengers.filter(
-      (p) => !(p.carpool_id === carpoolId && p.passenger_name === passengerName)
-    )
-  );
+export async function leaveCarpool(carpoolId: string, passengerName: string): Promise<void> {
+  await supabase
+    .from('carpool_passengers')
+    .delete()
+    .eq('carpool_id', carpoolId)
+    .eq('passenger_name', passengerName);
 }
 
-export function deleteCarpool(carpoolId: string): void {
-  setStore('carpools', getStore<Carpool>('carpools').filter((c) => c.id !== carpoolId));
-  setStore(
-    'carpool-passengers',
-    getStore<CarpoolPassenger>('carpool-passengers').filter((p) => p.carpool_id !== carpoolId)
-  );
+export async function deleteCarpool(carpoolId: string): Promise<void> {
+  // CASCADE handles passengers
+  await supabase.from('carpools').delete().eq('id', carpoolId);
 }

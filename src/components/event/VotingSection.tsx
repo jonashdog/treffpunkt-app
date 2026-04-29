@@ -24,30 +24,33 @@ export default function VotingSection({
 
   const savedName = typeof window !== 'undefined' ? getSavedVoterName(eventId) : null;
   const [voterName, setVoterName] = useState(savedName || '');
-  const [votes, setVotes] = useState<Record<string, VoteStatus>>(() => {
-    if (!savedName) return {};
-    const existing = getVotesForEvent(eventId).filter(
-      (v) => v.voter_name === savedName
-    );
-    const map: Record<string, VoteStatus> = {};
-    existing.forEach((v) => {
-      map[v.date_id] = v.status;
-    });
-    return map;
-  });
-  const [comments, setComments] = useState<Record<string, string>>(() => {
-    if (!savedName) return {};
-    const existing = getVotesForEvent(eventId).filter(
-      (v) => v.voter_name === savedName
-    );
-    const map: Record<string, string> = {};
-    existing.forEach((v) => {
-      if (v.comment) map[v.date_id] = v.comment;
-    });
-    return map;
-  });
+  const [votes, setVotes] = useState<Record<string, VoteStatus>>({});
+  const [comments, setComments] = useState<Record<string, string>>({});
   const [expandedComment, setExpandedComment] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(!!savedName);
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+
+  // Load existing votes for saved voter on mount
+  useMemo(() => {
+    if (savedName && !initialLoaded) {
+      setInitialLoaded(true);
+      getVotesForEvent(eventId).then((existingVotes) => {
+        const myVotes = existingVotes.filter((v) => v.voter_name === savedName);
+        if (myVotes.length > 0) {
+          const voteMap: Record<string, VoteStatus> = {};
+          const commentMap: Record<string, string> = {};
+          myVotes.forEach((v) => {
+            voteMap[v.date_id] = v.status;
+            if (v.comment) commentMap[v.date_id] = v.comment;
+          });
+          setVotes(voteMap);
+          setComments(commentMap);
+          setSubmitted(true);
+        }
+      });
+    }
+  }, [savedName, eventId, initialLoaded]);
 
   const isEditing = savedName === voterName && submitted;
 
@@ -62,18 +65,25 @@ export default function VotingSection({
     });
   }
 
-  function handleSubmit() {
-    if (!voterName.trim()) return;
+  async function handleSubmit() {
+    if (!voterName.trim() || isSubmitting) return;
+    setIsSubmitting(true);
 
-    const voteData = dates.map((d) => ({
-      dateId: d.id,
-      status: (votes[d.id] || 'no') as VoteStatus,
-      comment: comments[d.id],
-    }));
+    try {
+      const voteData = dates.map((d) => ({
+        dateId: d.id,
+        status: (votes[d.id] || 'no') as VoteStatus,
+        comment: comments[d.id],
+      }));
 
-    submitVotes(eventId, voterName.trim(), voteData);
-    setSubmitted(true);
-    onVotesChanged();
+      await submitVotes(eventId, voterName.trim(), voteData);
+      setSubmitted(true);
+      onVotesChanged();
+    } catch (err) {
+      console.error('Failed to submit votes:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const hasVotes = Object.keys(votes).length > 0;
@@ -198,15 +208,15 @@ export default function VotingSection({
       {voterName.trim() && (
         <button
           onClick={handleSubmit}
-          disabled={!hasVotes}
+          disabled={!hasVotes || isSubmitting}
           className={cn(
             'w-full py-3.5 rounded-xl font-semibold text-base transition-all duration-200',
-            hasVotes
+            hasVotes && !isSubmitting
               ? 'gradient-accent text-white hover:opacity-90 glow active:scale-[0.98]'
               : 'bg-white/5 text-[var(--color-text-muted)] cursor-not-allowed'
           )}
         >
-          {isEditing ? t('updateVote') : t('submitVote')}
+          {isSubmitting ? '⏳ ...' : isEditing ? t('updateVote') : t('submitVote')}
         </button>
       )}
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from '@/components/providers/I18nProvider';
 import {
   createCarpool,
@@ -19,10 +19,9 @@ interface CarpoolModuleProps {
 export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [carpools, setCarpools] = useState<CarpoolWithPassengers[]>(() =>
-    getCarpoolsForEvent(eventId)
-  );
+  const [carpools, setCarpools] = useState<CarpoolWithPassengers[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form state
   const [driverName, setDriverName] = useState('');
@@ -30,34 +29,76 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
   const [departure, setDeparture] = useState('');
   const [joinName, setJoinName] = useState('');
 
-  const refresh = useCallback(() => {
-    setCarpools(getCarpoolsForEvent(eventId));
+  const refresh = useCallback(async () => {
+    try {
+      const data = await getCarpoolsForEvent(eventId);
+      setCarpools(data);
+    } catch (err) {
+      console.error('Failed to refresh carpools:', err);
+    }
   }, [eventId]);
 
-  function handleCreateRide() {
-    if (!driverName.trim() || seats < 1) return;
-    createCarpool(eventId, driverName.trim(), seats, departure.trim());
-    setDriverName('');
-    setSeats(3);
-    setDeparture('');
-    setShowForm(false);
-    refresh();
+  useEffect(() => {
+    if (isOpen && carpools.length === 0) {
+      refresh();
+    }
+  }, [isOpen, refresh, carpools.length]);
+
+  async function handleCreateRide() {
+    if (!driverName.trim() || seats < 1 || isLoading) return;
+    setIsLoading(true);
+    try {
+      await createCarpool(eventId, driverName.trim(), seats, departure.trim());
+      setDriverName('');
+      setSeats(3);
+      setDeparture('');
+      setShowForm(false);
+      await refresh();
+    } catch (err) {
+      console.error('Failed to create ride:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function handleJoin(carpoolId: string) {
-    if (!joinName.trim()) return;
-    joinCarpool(carpoolId, joinName.trim());
-    refresh();
+  async function handleJoin(carpoolId: string) {
+    if (!joinName.trim() || isLoading) return;
+    setIsLoading(true);
+    try {
+      await joinCarpool(carpoolId, joinName.trim());
+      setJoinName('');
+      await refresh();
+    } catch (err) {
+      console.error('Failed to join ride:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function handleLeave(carpoolId: string, name: string) {
-    leaveCarpool(carpoolId, name);
-    refresh();
+  async function handleLeave(carpoolId: string, name: string) {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      await leaveCarpool(carpoolId, name);
+      await refresh();
+    } catch (err) {
+      console.error('Failed to leave ride:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function handleDelete(carpoolId: string) {
-    deleteCarpool(carpoolId);
-    refresh();
+  async function handleDelete(carpoolId: string) {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      await deleteCarpool(carpoolId);
+      await refresh();
+    } catch (err) {
+      console.error('Failed to delete ride:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -117,7 +158,8 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
                       </div>
                       <button
                         onClick={() => handleDelete(carpool.id)}
-                        className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors"
+                        disabled={isLoading}
+                        className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
                         title={t('deleteRide')}
                       >
                         ✕
@@ -168,7 +210,8 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
                             {p.passenger_name}
                             <button
                               onClick={() => handleLeave(carpool.id, p.passenger_name)}
-                              className="hover:text-[var(--color-danger)] transition-colors ml-0.5"
+                              disabled={isLoading}
+                              className="hover:text-[var(--color-danger)] transition-colors ml-0.5 disabled:opacity-50"
                               title={t('leaveRide')}
                             >
                               ✕
@@ -192,15 +235,15 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
                         />
                         <button
                           onClick={() => handleJoin(carpool.id)}
-                          disabled={!joinName.trim()}
+                          disabled={!joinName.trim() || isLoading}
                           className={cn(
                             'px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                            joinName.trim()
+                            joinName.trim() && !isLoading
                               ? 'gradient-accent text-white hover:opacity-90 active:scale-[0.97]'
                               : 'bg-white/5 text-[var(--color-text-muted)] cursor-not-allowed'
                           )}
                         >
-                          {t('joinRide')}
+                          {isLoading ? '⏳...' : t('joinRide')}
                         </button>
                       </div>
                     )}
@@ -212,7 +255,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
 
           {/* Create ride form */}
           {showForm ? (
-            <div className="bg-white/[0.03] border border-[var(--color-border)] rounded-xl p-4 space-y-3 animate-scale-in">
+             <div className="bg-white/[0.03] border border-[var(--color-border)] rounded-xl p-4 space-y-3 animate-scale-in">
               <input
                 type="text"
                 value={driverName}
@@ -274,15 +317,15 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
                 </button>
                 <button
                   onClick={handleCreateRide}
-                  disabled={!driverName.trim()}
+                  disabled={!driverName.trim() || isLoading}
                   className={cn(
                     'flex-1 py-2.5 rounded-lg text-sm font-medium transition-all',
-                    driverName.trim()
+                    driverName.trim() && !isLoading
                       ? 'gradient-accent text-white hover:opacity-90 active:scale-[0.97]'
                       : 'bg-white/5 text-[var(--color-text-muted)] cursor-not-allowed'
                   )}
                 >
-                  {t('save')}
+                  {isLoading ? '⏳...' : t('save')}
                 </button>
               </div>
             </div>
