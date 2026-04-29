@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/components/providers/I18nProvider';
-import { createEvent } from '@/lib/store';
+import { saveAdminToken } from '@/lib/store';
+import { createEventAction } from '@/lib/actions';
 import DatePicker from '@/components/event/DatePicker';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +47,8 @@ export default function EventForm() {
           return d.toISOString();
         });
 
-      const { event } = await createEvent(title.trim(), description.trim(), location.trim(), dateTimes);
+      const { event, adminToken } = await createEventAction(title.trim(), description.trim(), location.trim(), dateTimes);
+      saveAdminToken(event.id, adminToken);
       router.push(`/event/${event.id}`);
     } catch (err) {
       console.error('Failed to create event:', err);

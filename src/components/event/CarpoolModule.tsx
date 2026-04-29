@@ -3,12 +3,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from '@/components/providers/I18nProvider';
 import {
-  createCarpool,
-  getCarpoolsForEvent,
-  joinCarpool,
-  leaveCarpool,
-  deleteCarpool,
-} from '@/lib/store';
+  createCarpoolAction,
+  getCarpoolsAction,
+  joinCarpoolAction,
+  leaveCarpoolAction,
+  deleteCarpoolAction,
+} from '@/lib/actions';
 import { type CarpoolWithPassengers } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +31,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await getCarpoolsForEvent(eventId);
+      const data = await getCarpoolsAction(eventId);
       setCarpools(data);
     } catch (err) {
       console.error('Failed to refresh carpools:', err);
@@ -48,7 +48,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
     if (!driverName.trim() || seats < 1 || isLoading) return;
     setIsLoading(true);
     try {
-      await createCarpool(eventId, driverName.trim(), seats, departure.trim());
+      await createCarpoolAction(eventId, driverName.trim(), seats, departure.trim());
       setDriverName('');
       setSeats(3);
       setDeparture('');
@@ -65,7 +65,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
     if (!joinName.trim() || isLoading) return;
     setIsLoading(true);
     try {
-      await joinCarpool(carpoolId, joinName.trim());
+      await joinCarpoolAction(eventId, carpoolId, joinName.trim());
       setJoinName('');
       await refresh();
     } catch (err) {
@@ -79,7 +79,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      await leaveCarpool(carpoolId, name);
+      await leaveCarpoolAction(eventId, carpoolId, name);
       await refresh();
     } catch (err) {
       console.error('Failed to leave ride:', err);
@@ -92,7 +92,7 @@ export default function CarpoolModule({ eventId }: CarpoolModuleProps) {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      await deleteCarpool(carpoolId);
+      await deleteCarpoolAction(eventId, carpoolId);
       await refresh();
     } catch (err) {
       console.error('Failed to delete ride:', err);
