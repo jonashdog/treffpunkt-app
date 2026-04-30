@@ -2,6 +2,8 @@
 
 A lightweight, mobile-first web app for collaborative scheduling. A modern alternative to Doodle – completely without forced registration, without ads, and without hidden hurdles.
 
+🌐 **Live:** [treffpunkt.me](https://treffpunkt.me)
+
 ![Tech Stack](https://img.shields.io/badge/Next.js%2015-black?style=flat-square&logo=next.js)
 ![Tech Stack](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)
 ![Tech Stack](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css)

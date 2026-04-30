@@ -49,7 +49,7 @@ export default function EventForm() {
 
       const { event, adminToken } = await createEventAction(title.trim(), description.trim(), location.trim(), dateTimes);
       saveAdminToken(event.id, adminToken);
-      router.push(`/event/${event.id}`);
+      router.push(`/event/${event.id}?created=true`);
     } catch (err) {
       console.error('Failed to create event:', err);
       setIsSubmitting(false);
