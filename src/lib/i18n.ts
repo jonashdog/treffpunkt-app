@@ -110,6 +110,14 @@ export const translations = {
     aboutDevTitle: 'Über den Entwickler',
     aboutDevP1: 'Ich bin Jonas und habe Treffpunkt in meiner Freizeit entwickelt. Wenn dir die App gefällt und sie dir hilft, Zeit zu sparen – wunderbar! Genau dafür ist sie gedacht.',
     aboutDevP2: '🤖 Dieses Projekt wurde mit Unterstützung von Künstlicher Intelligenz entwickelt.',
+    // FAQ / Privacy
+    faqTitle: 'FAQ',
+    faqWhereTitle: '📍 Wo werden meine Daten gespeichert?',
+    faqWhereP1: 'Die Daten (Event-Titel, Termine, Abstimmungen, Fahrgemeinschaften) werden anonymisiert in der Cloud-Datenbank von Supabase gespeichert. Die Server stehen bei AWS (Amazon Web Services) in der EU (Frankfurt).',
+    faqHowLongTitle: '⏳ Wie lange werden die Daten gespeichert?',
+    faqHowLongP1: 'Events werden automatisch nach 6 Monaten gelöscht. Der Ersteller eines Events kann es zusätzlich jederzeit über den Admin-Bereich manuell löschen – dann werden alle zugehörigen Daten sofort und unwiderruflich entfernt.',
+    faqWhatDataTitle: '🔒 Welche Daten werden gespeichert?',
+    faqWhatDataP1: 'Nur das, was du eingibst: Event-Titel, Beschreibung, Ort, vorgeschlagene Termine, abgegebene Stimmen (mit dem Namen, den du eingibst) und Fahrgemeinschaften. Es gibt keine Registrierung, keine E-Mail-Adressen, kein Tracking und keine Cookies (außer der Spracheinstellung).',
   },
   en: {
     appName: 'Treffpunkt',
@@ -207,6 +215,14 @@ export const translations = {
     aboutDevTitle: 'About the developer',
     aboutDevP1: 'I am Jonas. Since trying to coordinate dates with my friends always ended in absolute chaos, I built this app "just for fun". I hope it saves you as much sanity as it saves me!',
     aboutDevP2: '🤖 This project was developed with the assistance of AI.',
+    // FAQ / Privacy
+    faqTitle: 'FAQ',
+    faqWhereTitle: '📍 Where is my data stored?',
+    faqWhereP1: 'Your data (event title, dates, votes, carpools) is stored in a secure cloud database powered by Supabase. Supabase provides a protected database in the cloud – think of it as a digital spreadsheet on a secured server. The servers are hosted by AWS (Amazon Web Services) in the EU (Frankfurt, Germany).',
+    faqHowLongTitle: '⏳ How long is my data stored?',
+    faqHowLongP1: 'Events are automatically deleted after 6 months. The event creator can also manually delete their event at any time via the admin area – all associated data (dates, votes, carpools) will be permanently removed.',
+    faqWhatDataTitle: '🔒 What data is collected?',
+    faqWhatDataP1: 'Only what you type in: event title, description, location, suggested dates, votes (with the name you provide), and carpools. There is no registration, no email addresses, no tracking, and no cookies (except for the language setting).',
   },
 } as const;
 
