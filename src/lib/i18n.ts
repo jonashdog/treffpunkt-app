@@ -101,7 +101,7 @@ export const translations = {
     delete: 'Löschen',
     // About Page
     aboutProject: 'Über dieses Projekt',
-    aboutP1: 'Treffpunkt ist entstanden, um das Planen von gemeinsamen Terminen mit Freunden so einfach und reibungslos wie möglich zu machen. Keine Anmeldung, keine versteckten Kosten, keine Werbung – einfach nur ein Link und ein paar Klicks.',
+    aboutP1: 'Treffpunkt ist entstanden, um das Planen von gemeinsamen Terminen mit Freund*innen so einfach und reibungslos wie möglich zu machen. Keine Anmeldung, keine versteckten Kosten, keine Werbung – einfach nur ein Link und ein paar Klicks.',
     openSourceTitle: 'Open Source & Transparenz',
     openSourceP1: 'Dieses Projekt ist komplett Open Source. Das bedeutet, der gesamte Quellcode ist öffentlich einsehbar.',
     githubRepo: 'GitHub Repository',
