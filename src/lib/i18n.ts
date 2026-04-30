@@ -117,7 +117,7 @@ export const translations = {
     faqHowLongTitle: '⏳ Wie lange werden die Daten gespeichert?',
     faqHowLongP1: 'Events werden automatisch nach 6 Monaten gelöscht. Der Ersteller eines Events kann es zusätzlich jederzeit über den Admin-Bereich manuell löschen – dann werden alle zugehörigen Daten sofort und unwiderruflich entfernt.',
     faqWhatDataTitle: '🔒 Welche Daten werden gespeichert?',
-    faqWhatDataP1: 'Nur das, was du eingibst: Event-Titel, Beschreibung, Ort, vorgeschlagene Termine, abgegebene Stimmen (mit dem Namen, den du eingibst) und Fahrgemeinschaften. Es gibt keine Registrierung, keine E-Mail-Adressen, kein Tracking und keine Cookies (außer der Spracheinstellung).',
+    faqWhatDataP1: 'Nur das, was du eingibst: Event-Titel, Beschreibung, Ort, vorgeschlagene Termine, abgegebene Stimmen (mit dem Namen, den du eingibst) und Fahrgemeinschaften. Es gibt keine Registrierung, keine E-Mail-Adressen, kein Tracking und keine Cookies (außer für die Spracheinstellung).',
   },
   en: {
     appName: 'Treffpunkt',
