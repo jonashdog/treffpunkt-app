@@ -4,13 +4,13 @@ import ClientProviders from "@/components/providers/ClientProviders";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://treffpunkt.me"),
-  title: "Treffpunkt – Find dates. Without stress.",
+  title: "Treffpunkt – Termine finden. Ohne Stress.",
   description:
-    "Create a poll, share the link and find the best date together – no registration needed.",
-  keywords: ["scheduling", "Doodle alternative", "date poll", "meet friends", "Terminfindung"],
+    "Erstelle eine Umfrage, teile den Link und findet gemeinsam den besten Termin – ganz ohne Registrierung.",
+  keywords: ["Terminfindung", "Doodle Alternative", "Terminumfrage", "Freunde treffen", "scheduling"],
   openGraph: {
-    title: "Treffpunkt – Find dates. Without stress.",
-    description: "Create a poll, share the link and find the best date together.",
+    title: "Treffpunkt – Termine finden. Ohne Stress.",
+    description: "Erstelle eine Umfrage, teile den Link und findet gemeinsam den besten Termin.",
     type: "website",
     url: "https://treffpunkt.me",
   },
