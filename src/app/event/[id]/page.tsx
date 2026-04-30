@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/components/providers/I18nProvider';
 import { getAdminTokens } from '@/lib/store';
 import { getEventAction, getVotesAction, checkAdminAction } from '@/lib/actions';
@@ -10,10 +10,13 @@ import VotingSection from '@/components/event/VotingSection';
 import VoteResultsGrid from '@/components/event/VoteResultsGrid';
 import ShareButton from '@/components/event/ShareButton';
 import CarpoolModule from '@/components/event/CarpoolModule';
+import SuccessOverlay from '@/components/event/SuccessOverlay';
 import { cn } from '@/lib/utils';
 
 export default function EventPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const eventId = params.id as string;
   const { t } = useTranslation();
 
@@ -22,6 +25,7 @@ export default function EventPage() {
   const [isEventAdmin, setIsEventAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'vote' | 'results'>('vote');
+  const [showSuccess, setShowSuccess] = useState(searchParams.get('created') === 'true');
 
   const loadData = useCallback(async () => {
     try {
@@ -30,7 +34,7 @@ export default function EventPage() {
       if (ev) {
         const tokens = getAdminTokens();
         const localToken = tokens[eventId];
-        
+
         const [votesData, adminStatus] = await Promise.all([
           getVotesAction(eventId),
           localToken ? checkAdminAction(eventId, localToken) : Promise.resolve(false),
@@ -74,6 +78,18 @@ export default function EventPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6 animate-fade-in-up">
+      {/* Success overlay after event creation */}
+      {showSuccess && event && (
+        <SuccessOverlay
+          eventTitle={event.title}
+          eventUrl={typeof window !== 'undefined' ? `${window.location.origin}/event/${eventId}` : ''}
+          onDismiss={() => {
+            setShowSuccess(false);
+            router.replace(`/event/${eventId}`, { scroll: false });
+          }}
+        />
+      )}
+
       {/* Event header */}
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-3">

@@ -99,6 +99,80 @@ export async function deleteEventAction(id: string, adminToken: string): Promise
   return true;
 }
 
+export async function updateEventAction(
+  eventId: string,
+  adminToken: string,
+  data: { title?: string; description?: string; location?: string }
+): Promise<boolean> {
+  const isAdmin = await checkAdminAction(eventId, adminToken);
+  if (!isAdmin) return false;
+
+  const updateData: Record<string, string | null> = {};
+  if (data.title !== undefined) updateData.title = data.title;
+  if (data.description !== undefined) updateData.description = data.description || null;
+  if (data.location !== undefined) updateData.location = data.location || null;
+
+  await supabase.from('events').update(updateData).eq('id', eventId);
+  revalidatePath(`/event/${eventId}`);
+  revalidatePath(`/event/${eventId}/admin`);
+  return true;
+}
+
+export async function addDateOptionAction(
+  eventId: string,
+  adminToken: string,
+  datetime: string
+): Promise<DateOption | null> {
+  const isAdmin = await checkAdminAction(eventId, adminToken);
+  if (!isAdmin) return null;
+
+  const { data, error } = await supabase
+    .from('date_options')
+    .insert({ event_id: eventId, datetime })
+    .select()
+    .single();
+
+  if (error || !data) return null;
+
+  revalidatePath(`/event/${eventId}`);
+  revalidatePath(`/event/${eventId}/admin`);
+  return data as DateOption;
+}
+
+export async function removeDateOptionAction(
+  eventId: string,
+  dateId: string,
+  adminToken: string
+): Promise<boolean> {
+  const isAdmin = await checkAdminAction(eventId, adminToken);
+  if (!isAdmin) return false;
+
+  // Check how many dates remain – don't allow removing the last one
+  const { data: remaining } = await supabase
+    .from('date_options')
+    .select('id')
+    .eq('event_id', eventId);
+
+  if (!remaining || remaining.length <= 1) return false;
+
+  // Delete votes for this date first
+  await supabase.from('votes').delete().eq('date_id', dateId);
+
+  // If this date was fixed, unfix it
+  await supabase
+    .from('events')
+    .update({ fixed_date_id: null })
+    .eq('id', eventId)
+    .eq('fixed_date_id', dateId);
+
+  // Delete the date option
+  await supabase.from('date_options').delete().eq('id', dateId);
+
+  revalidatePath(`/event/${eventId}`);
+  revalidatePath(`/event/${eventId}/admin`);
+  return true;
+}
+
 export async function fixDateAction(eventId: string, dateId: string, adminToken: string): Promise<boolean> {
   const isAdmin = await checkAdminAction(eventId, adminToken);
   if (!isAdmin) return false;
