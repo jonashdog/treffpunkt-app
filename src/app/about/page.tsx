@@ -56,6 +56,35 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+            {t('faqTitle')}
+          </h2>
+
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-white/5 border border-[var(--color-border)]">
+              <h3 className="font-medium text-[var(--color-text-primary)] mb-2">
+                {t('faqWhereTitle')}
+              </h3>
+              <p className="text-sm">{t('faqWhereP1')}</p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-[var(--color-border)]">
+              <h3 className="font-medium text-[var(--color-text-primary)] mb-2">
+                {t('faqHowLongTitle')}
+              </h3>
+              <p className="text-sm">{t('faqHowLongP1')}</p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-[var(--color-border)]">
+              <h3 className="font-medium text-[var(--color-text-primary)] mb-2">
+                {t('faqWhatDataTitle')}
+              </h3>
+              <p className="text-sm">{t('faqWhatDataP1')}</p>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* Footer */}
