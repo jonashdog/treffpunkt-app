@@ -126,11 +126,11 @@ export const translations = {
     // FAQ / Privacy
     faqTitle: 'Häufige Fragen',
     faqWhereTitle: '📍 Wo werden meine Daten gespeichert?',
-    faqWhereP1: 'Die Daten (Event-Titel, Termine, Abstimmungen, Fahrgemeinschaften) werden in einer sicheren Cloud-Datenbank bei Supabase gespeichert. Supabase ist ein Cloud-Dienst, der eine geschützte Datenbank im Internet bereitstellt – vergleichbar mit einer digitalen Tabelle auf einem gesicherten Server. Die Server stehen bei AWS (Amazon Web Services) in der EU (Frankfurt).',
+    faqWhereP1: 'Die Daten (Event-Titel, Termine, Abstimmungen, Fahrgemeinschaften) werden in einer sicheren Cloud-Datenbank bei Supabase gespeichert. Die Server stehen bei AWS (Amazon Web Services) in der EU (Frankfurt).',
     faqHowLongTitle: '⏳ Wie lange werden die Daten gespeichert?',
     faqHowLongP1: 'Events werden automatisch nach 6 Monaten gelöscht. Der Ersteller eines Events kann es zusätzlich jederzeit über den Admin-Bereich manuell löschen – dann werden alle zugehörigen Daten sofort und unwiderruflich entfernt.',
     faqWhatDataTitle: '🔒 Welche Daten werden gespeichert?',
-    faqWhatDataP1: 'Nur das, was du eingibst: Event-Titel, Beschreibung, Ort, vorgeschlagene Termine, abgegebene Stimmen (mit dem Namen, den du eingibst) und Fahrgemeinschaften. Es gibt keine Registrierung, keine E-Mail-Adressen, kein Tracking und keine Cookies (außer der Spracheinstellung).',
+    faqWhatDataP1: 'Nur das, was du eingibst: Event-Titel, Beschreibung, Ort, vorgeschlagene Termine, abgegebene Stimmen (mit dem Namen, den du eingibst) und Fahrgemeinschaften. Es gibt keine Registrierung, keine E-Mail-Adressen, kein Tracking und keine Cookies (außer für die Spracheinstellung).',
   },
   en: {
     appName: 'Treffpunkt',
